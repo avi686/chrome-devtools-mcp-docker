@@ -1,38 +1,25 @@
 services:
   chrome:
-    image: selenium/standalone-chrome:latest
+    image: browserless/chrome:latest
     ports:
-      - "9222:9222"
-      - "4444:4444"  # Selenium WebDriver port (optional)
-    command: >
-      sh -c "mkdir -p /tmp/chrome-data && chmod 777 /tmp/chrome-data && 
-      google-chrome 
-      --remote-debugging-address=0.0.0.0 
-      --remote-debugging-port=9222 
-      --headless=new 
-      --no-sandbox 
-      --disable-dev-shm-usage 
-      --disable-gpu 
-      --disable-software-rasterizer 
-      --disable-extensions 
-      --disable-web-security 
-      --disable-features=VizDisplayCompositor 
-      --user-data-dir=/tmp/chrome-data 
-      --window-size=1920,1080 
-      --ignore-certificate-errors 
-      --disable-blink-features=AutomationControlled 
-      about:blank"
+      - "9222:3000"  # browserless uses port 3000 internally
+    environment:
+      - CONNECTION_TIMEOUT=60000
+      - MAX_CONCURRENT_SESSIONS=10
+      - CHROME_REFRESH_TIME=0
+      - ENABLE_DEBUGGER=true
+      - FUNCTION_ENABLE_INCOGNITO_MODE=true
+      - HEALTH=true
+      - DEFAULT_LAUNCH_ARGS=["--no-sandbox","--disable-setuid-sandbox","--disable-dev-shm-usage","--disable-gpu"]
     volumes:
       - /dev/shm:/dev/shm
-      - chrome-data:/tmp/chrome-data
     restart: unless-stopped
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:9222/json/version"]
+      test: ["CMD", "curl", "-f", "http://localhost:3000/health"]
       interval: 30s
       timeout: 10s
       retries: 5
       start_period: 60s
-    user: root  # Run as root to avoid permission issues
 
 volumes:
   chrome-data:
