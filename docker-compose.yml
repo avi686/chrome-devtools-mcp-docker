@@ -1,5 +1,3 @@
-version: '3.8'
-
 services:
   chrome:
     image: selenium/standalone-chrome:latest
@@ -7,17 +5,7 @@ services:
       - "9222:9222"
       - "4444:4444"  # Selenium WebDriver port (optional)
     command: >
-      sh -c "google-chrome 
-             --remote-debugging-address=0.0.0.0 
-             --remote-debugging-port=9222 
-             --headless 
-             --no-sandbox 
-             --disable-dev-shm-usage 
-             --disable-gpu 
-             --disable-web-security
-             --user-data-dir=/tmp/chrome-data 
-             --window-size=1920,1080
-             about:blank"
+      sh -c "google-chrome --remote-debugging-address=0.0.0.0 --remote-debugging-port=9222 --headless --no-sandbox --disable-dev-shm-usage --disable-gpu --disable-web-security --user-data-dir=/tmp/chrome-data --window-size=1920,1080 about:blank"
     volumes:
       - /dev/shm:/dev/shm
       - chrome-data:/tmp/chrome-data
