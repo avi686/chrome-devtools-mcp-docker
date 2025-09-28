@@ -41,7 +41,17 @@ else
     sleep 10
 fi
 
-# Test 3: Check Chrome debugging endpoint
+# Test 3: Check Chrome health endpoint
+print_test "Testing Chrome health endpoint..."
+if curl -f http://localhost:9222/health &> /dev/null; then
+    print_pass "Chrome health endpoint is accessible"
+else
+    print_fail "Chrome health endpoint is not accessible"
+    echo "Container logs:"
+    docker-compose logs chrome | tail -20
+fi
+
+# Test 4: Check Chrome debugging endpoint
 print_test "Testing Chrome debugging endpoint..."
 if curl -f http://localhost:9222/json/version &> /dev/null; then
     print_pass "Chrome debugging endpoint is accessible"
@@ -50,13 +60,19 @@ if curl -f http://localhost:9222/json/version &> /dev/null; then
     CHROME_VERSION=$(curl -s http://localhost:9222/json/version | grep -o '"Browser":"[^"]*"' | cut -d'"' -f4)
     echo "Chrome version: $CHROME_VERSION"
 else
-    print_fail "Chrome debugging endpoint is not accessible"
-    echo "Container logs:"
-    docker-compose logs chrome | tail -20
-    exit 1
+    # For browserless, the endpoint might be different
+    print_test "Trying browserless endpoints..."
+    if curl -f http://localhost:9222/ &> /dev/null; then
+        print_pass "Browserless endpoint is accessible"
+    else
+        print_fail "Chrome/Browserless endpoint is not accessible"
+        echo "Container logs:"
+        docker-compose logs chrome | tail -20
+        exit 1
+    fi
 fi
 
-# Test 4: Check if Node.js is installed
+# Test 5: Check if Node.js is installed
 print_test "Checking Node.js installation..."
 if command -v node &> /dev/null; then
     NODE_VERSION=$(node --version)
@@ -74,7 +90,7 @@ else
     exit 1
 fi
 
-# Test 5: Check if chrome-devtools-mcp is installed
+# Test 6: Check if chrome-devtools-mcp is installed
 print_test "Checking chrome-devtools-mcp installation..."
 if npm list -g chrome-devtools-mcp &> /dev/null; then
     print_pass "chrome-devtools-mcp is installed globally"
@@ -84,7 +100,7 @@ else
     npm install -g chrome-devtools-mcp@latest
 fi
 
-# Test 6: Test MCP server connection
+# Test 7: Test MCP server connection
 print_test "Testing MCP server connection..."
 timeout 5s npx chrome-devtools-mcp@latest --browserUrl=http://localhost:9222 --help &> /dev/null
 if [ $? -eq 0 ] || [ $? -eq 124 ]; then  # 124 is timeout exit code
@@ -93,7 +109,7 @@ else
     print_fail "MCP server cannot connect to Chrome"
 fi
 
-# Test 7: Check Claude Desktop configuration
+# Test 8: Check Claude Desktop configuration
 print_test "Checking Claude Desktop configuration..."
 CLAUDE_CONFIG=""
 if [[ "$OSTYPE" == "darwin"* ]]; then
@@ -116,21 +132,27 @@ else
     echo "Expected location: $CLAUDE_CONFIG"
 fi
 
-# Test 8: Check port availability
+# Test 9: Check port availability
 print_test "Checking if port 9222 is available..."
-if lsof -i :9222 &> /dev/null; then
+if netstat -an | grep -q ":9222.*LISTEN" || lsof -i :9222 &> /dev/null || ss -tuln | grep -q ":9222"; then
     print_pass "Port 9222 is in use (as expected for Chrome debugging)"
 else
     print_fail "Port 9222 is not in use - Chrome may not be running properly"
 fi
 
-# Test 9: Test basic Chrome operations
-print_test "Testing basic Chrome operations..."
-TABS_RESPONSE=$(curl -s http://localhost:9222/json/list)
-if echo "$TABS_RESPONSE" | grep -q '"type":"page"'; then
-    print_pass "Chrome has active tabs/pages"
+# Test 10: Test browserless specific endpoints
+print_test "Testing browserless functionality..."
+BROWSERLESS_RESPONSE=$(curl -s http://localhost:9222/)
+if echo "$BROWSERLESS_RESPONSE" | grep -q "browserless" || echo "$BROWSERLESS_RESPONSE" | grep -q "webSocketDebuggerUrl"; then
+    print_pass "Browserless/Chrome DevTools is responding"
+    
+    # Try to get WebSocket URL
+    WS_URL=$(curl -s http://localhost:9222/json/version 2>/dev/null | grep -o '"webSocketDebuggerUrl":"[^"]*"' | cut -d'"' -f4)
+    if [ -n "$WS_URL" ]; then
+        echo "WebSocket URL: $WS_URL"
+    fi
 else
-    print_fail "No active Chrome tabs found"
+    print_fail "Browserless/Chrome DevTools not responding correctly"
 fi
 
 echo ""
@@ -142,9 +164,9 @@ echo "1. Restart Claude Desktop completely"
 echo "2. Test with Claude by asking: 'Navigate to https://google.com and tell me what you see'"
 echo ""
 echo "Useful endpoints:"
+echo "- Browserless health: curl http://localhost:9222/health"
 echo "- Chrome version: curl http://localhost:9222/json/version"
-echo "- Active tabs: curl http://localhost:9222/json/list"
-echo "- New tab: curl -X POST http://localhost:9222/json/new"
+echo "- Active sessions: curl http://localhost:9222/json/list"
 echo ""
 echo "If you encounter issues:"
 echo "- Check container logs: docker-compose logs chrome"
