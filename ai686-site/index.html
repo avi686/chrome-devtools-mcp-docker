@@ -1,0 +1,306 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ai686 — AI that's actually useful</title>
+<meta name="description" content="A small AI studio in Los Angeles. Custom songs, AI jingles, photo restoration and product photos. Hear or see a free preview before you pay.">
+<meta name="theme-color" content="#0d0b09">
+<style>
+  :root {
+    --bg: #0d0b09;
+    --bg-2: #14110d;
+    --card: #1a1611;
+    --line: #2a231a;
+    --text: #f4ede3;
+    --muted: #b5a995;
+    --amber: #f5a524;
+    --amber-2: #ffcb6b;
+    --glow: rgba(245, 165, 36, .22);
+    --radius: 18px;
+  }
+  * { box-sizing: border-box; margin: 0; }
+  html { scroll-behavior: smooth; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font: 17px/1.6 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    -webkit-font-smoothing: antialiased;
+  }
+  a { color: inherit; }
+  .wrap { width: min(1080px, 100% - 32px); margin-inline: auto; }
+
+  /* nav */
+  header.nav {
+    position: sticky; top: 0; z-index: 10;
+    background: rgba(13, 11, 9, .8);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--line);
+  }
+  .nav .wrap { display: flex; align-items: center; justify-content: space-between; height: 64px; gap: 16px; }
+  .logo { font-weight: 800; font-size: 1.25rem; letter-spacing: -.02em; text-decoration: none; }
+  .logo span { color: var(--amber); }
+  .nav nav { display: flex; gap: 22px; align-items: center; }
+  .nav nav a { text-decoration: none; color: var(--muted); font-size: .95rem; }
+  .nav nav a:hover { color: var(--text); }
+
+  .btn {
+    display: inline-block; text-decoration: none; font-weight: 700;
+    padding: 12px 22px; border-radius: 999px;
+    background: linear-gradient(135deg, var(--amber-2), var(--amber));
+    color: #1a1204; box-shadow: 0 6px 28px var(--glow);
+    transition: transform .15s ease, box-shadow .15s ease;
+  }
+  .btn:hover { transform: translateY(-2px); box-shadow: 0 10px 34px rgba(245, 165, 36, .35); }
+  .btn.ghost { background: transparent; color: var(--text); border: 1px solid var(--line); box-shadow: none; }
+  .btn.ghost:hover { border-color: var(--amber); }
+  .nav .btn { padding: 9px 18px; font-size: .9rem; color: #1a1204; }
+  .nav nav a.btn { color: #1a1204; }
+
+  /* hero */
+  .hero {
+    position: relative; overflow: hidden; text-align: center;
+    padding: clamp(72px, 14vw, 150px) 0 clamp(64px, 10vw, 110px);
+    background:
+      radial-gradient(ellipse 60% 55% at 50% 0%, rgba(245, 165, 36, .28), transparent 70%),
+      radial-gradient(ellipse 40% 40% at 85% 90%, rgba(255, 140, 50, .10), transparent 70%),
+      var(--bg);
+  }
+  .eyebrow {
+    display: inline-block; font-size: .8rem; letter-spacing: .14em; text-transform: uppercase;
+    color: var(--amber-2); border: 1px solid var(--line); background: var(--bg-2);
+    padding: 6px 14px; border-radius: 999px; margin-bottom: 26px;
+  }
+  h1 {
+    font-size: clamp(2.4rem, 7vw, 4.6rem); line-height: 1.05; letter-spacing: -.035em; font-weight: 800;
+    max-width: 14ch; margin-inline: auto;
+  }
+  h1 em {
+    font-style: normal;
+    background: linear-gradient(120deg, var(--amber-2), var(--amber));
+    -webkit-background-clip: text; background-clip: text; color: transparent;
+  }
+  .hero p.lead { color: var(--muted); font-size: clamp(1.05rem, 2.4vw, 1.3rem); max-width: 40ch; margin: 24px auto 36px; }
+  .hero .cta { display: flex; gap: 14px; justify-content: center; flex-wrap: wrap; }
+
+  /* sections */
+  section { padding: clamp(56px, 9vw, 96px) 0; }
+  section.alt { background: var(--bg-2); border-block: 1px solid var(--line); }
+  h2 { font-size: clamp(1.7rem, 4vw, 2.5rem); letter-spacing: -.025em; line-height: 1.15; }
+  .sub { color: var(--muted); max-width: 52ch; margin-top: 12px; }
+  .head { margin-bottom: 40px; }
+
+  /* services */
+  .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 20px; }
+  .card {
+    background: var(--card); border: 1px solid var(--line); border-radius: var(--radius);
+    padding: 28px; display: flex; flex-direction: column; gap: 10px;
+    transition: transform .2s ease, border-color .2s ease, box-shadow .2s ease;
+  }
+  .card:hover { transform: translateY(-4px); border-color: rgba(245, 165, 36, .55); box-shadow: 0 14px 40px rgba(0, 0, 0, .4), 0 0 0 1px var(--glow); }
+  .card .icon { font-size: 1.8rem; }
+  .card h3 { font-size: 1.25rem; letter-spacing: -.01em; }
+  .card p { color: var(--muted); font-size: .98rem; flex: 1; }
+  .price { font-size: 1.9rem; font-weight: 800; color: var(--amber-2); letter-spacing: -.02em; }
+  .price small { font-size: .85rem; font-weight: 500; color: var(--muted); margin-left: 4px; }
+  .tag { font-size: .82rem; color: var(--amber); }
+
+  /* spotlight */
+  .spot { display: grid; grid-template-columns: 1.1fr .9fr; gap: 40px; align-items: center; }
+  .spot ul { list-style: none; padding: 0; margin: 22px 0 28px; display: grid; gap: 10px; }
+  .spot li { padding-left: 28px; position: relative; color: var(--muted); }
+  .spot li::before { content: "♪"; position: absolute; left: 0; color: var(--amber); font-weight: 700; }
+  .player {
+    background: var(--card); border: 1px solid var(--line); border-radius: 24px; padding: 28px;
+    box-shadow: 0 0 80px var(--glow);
+  }
+  .player .label { font-size: .8rem; letter-spacing: .12em; text-transform: uppercase; color: var(--muted); }
+  .wave { display: flex; align-items: center; gap: 4px; height: 90px; margin: 20px 0; }
+  .wave i {
+    flex: 1; border-radius: 4px; background: linear-gradient(var(--amber-2), var(--amber));
+    animation: pulse 1.6s ease-in-out infinite;
+  }
+  .wave i:nth-child(3n) { animation-delay: .2s; } .wave i:nth-child(3n+1) { animation-delay: .5s; } .wave i:nth-child(4n) { animation-delay: .9s; }
+  @keyframes pulse { 0%, 100% { height: 22%; opacity: .55; } 50% { height: 100%; opacity: 1; } }
+  .player .meta { display: flex; justify-content: space-between; color: var(--muted); font-size: .9rem; }
+
+  /* promise */
+  .promise { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 20px; }
+  .promise div { padding: 4px 0; }
+  .promise strong { display: block; font-size: 1.1rem; margin-bottom: 6px; color: var(--amber-2); }
+  .promise span { color: var(--muted); }
+
+  /* soon */
+  .soon { display: flex; flex-wrap: wrap; gap: 14px; margin-top: 8px; }
+  .pill { border: 1px dashed #4a3d29; border-radius: 999px; padding: 10px 20px; color: var(--muted); }
+  .pill b { color: var(--amber); font-weight: 600; margin-right: 8px; font-size: .78rem; letter-spacing: .08em; text-transform: uppercase; }
+
+  /* about / contact */
+  .about { max-width: 60ch; color: var(--muted); font-size: 1.08rem; }
+  .about strong { color: var(--text); }
+  .contact-box {
+    text-align: center; background: radial-gradient(ellipse 70% 100% at 50% 0%, rgba(245, 165, 36, .18), transparent 70%), var(--card);
+    border: 1px solid var(--line); border-radius: 28px; padding: clamp(36px, 6vw, 64px) 24px;
+  }
+  .contact-box h2 { margin-bottom: 12px; }
+  .contact-box .links { display: flex; gap: 14px; justify-content: center; flex-wrap: wrap; margin-top: 28px; }
+
+  footer { border-top: 1px solid var(--line); padding: 32px 0; color: var(--muted); font-size: .9rem; }
+  footer .wrap { display: flex; justify-content: space-between; flex-wrap: wrap; gap: 14px; }
+  footer nav { display: flex; gap: 20px; }
+  footer a { text-decoration: none; } footer a:hover { color: var(--text); }
+
+  a:focus-visible, .btn:focus-visible { outline: 2px solid var(--amber-2); outline-offset: 3px; }
+
+  @media (max-width: 760px) {
+    .nav nav a:not(.btn) { display: none; }
+    .spot { grid-template-columns: 1fr; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    * { animation: none !important; transition: none !important; }
+    html { scroll-behavior: auto; }
+  }
+</style>
+</head>
+<body>
+
+<header class="nav">
+  <div class="wrap">
+    <a class="logo" href="#top">ai<span>686</span></a>
+    <nav aria-label="Main">
+      <a href="#services">Services</a>
+      <a href="#instasong">InstaSong</a>
+      <a href="#about">About</a>
+      <a href="#contact">Contact</a>
+      <a class="btn" href="#instasong">Create a song</a>
+    </nav>
+  </div>
+</header>
+
+<main id="top">
+  <div class="hero">
+    <div class="wrap">
+      <span class="eyebrow">Los Angeles AI studio</span>
+      <h1>AI that's <em>actually useful</em></h1>
+      <p class="lead">AI that makes something worth keeping. Hear it or see it first, and pay only if you love it.</p>
+      <div class="cta">
+        <a class="btn" href="#services">See what we make</a>
+        <a class="btn ghost" href="#contact">Get a free preview</a>
+      </div>
+    </div>
+  </div>
+
+  <section id="services">
+    <div class="wrap">
+      <div class="head">
+        <h2>Live services</h2>
+        <p class="sub">Every one starts with a free preview, so you know exactly what you're getting.</p>
+      </div>
+      <div class="grid">
+        <article class="card">
+          <div class="icon" aria-hidden="true">🎵</div>
+          <h3>InstaSong</h3>
+          <p>A custom song written from your personal story.</p>
+          <div class="price">$19<small>full song</small></div>
+          <div class="tag">Free 30-second preview</div>
+        </article>
+        <article class="card">
+          <div class="icon" aria-hidden="true">🔔</div>
+          <h3>AI Jingles</h3>
+          <p>Three original audio signatures for your business.</p>
+          <div class="price">$79<small>per pack</small></div>
+          <div class="tag">Free previews</div>
+        </article>
+        <article class="card">
+          <div class="icon" aria-hidden="true">🖼️</div>
+          <h3>Photo Restoration &amp; 4K Upscale</h3>
+          <p>Old photos restored and enlarged.</p>
+          <div class="price">$29<small>up to 3 photos</small></div>
+          <div class="tag">Free preview</div>
+        </article>
+        <article class="card">
+          <div class="icon" aria-hidden="true">📦</div>
+          <h3>Product Photo Studio Pack</h3>
+          <p>Your product photo turned into ten listing-ready images.</p>
+          <div class="price">$149<small>per product</small></div>
+          <div class="tag">Free preview</div>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <section id="instasong" class="alt">
+    <div class="wrap spot">
+      <div>
+        <h2>Your story, as a song</h2>
+        <p class="sub">Tell us about a person, a moment or a memory. We write a song around it, in the language you choose.</p>
+        <ul>
+          <li>Hear a free 30-second preview before paying anything</li>
+          <li>$19 for the full song</li>
+          <li>Choose the language of your song</li>
+        </ul>
+        <a class="btn" href="mailto:support@ai686.tech?subject=InstaSong%20preview">Create my song</a>
+      </div>
+      <div class="player" aria-hidden="true">
+        <div class="label">Now previewing</div>
+        <div class="wave"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+        <div class="meta"><span>Free preview</span><span>0:30</span></div>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="wrap">
+      <div class="head"><h2>How we work</h2></div>
+      <div class="promise">
+        <div><strong>Preview first</strong><span>Hear it or see it before you pay.</span></div>
+        <div><strong>Honest about what's ready</strong><span>Finished products are listed as live. Everything else says coming soon.</span></div>
+        <div><strong>A real person</strong><span>You talk to the owner, not a support queue.</span></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="alt">
+    <div class="wrap">
+      <div class="head"><h2>Coming soon</h2><p class="sub">In development. We'll say so until they're ready.</p></div>
+      <div class="soon">
+        <span class="pill"><b>Soon</b>AI Phone Receptionist</span>
+        <span class="pill"><b>Soon</b>Websites with AI Chatbot</span>
+      </div>
+    </div>
+  </section>
+
+  <section id="about">
+    <div class="wrap">
+      <div class="head"><h2>About</h2></div>
+      <p class="about"><strong>ai686</strong> is a small AI studio in Los Angeles, founded in January 2026 and run by one person in California. The focus is practical AI that makes something worth keeping, with plain talk about what's finished and what's still being built.</p>
+    </div>
+  </section>
+
+  <section id="contact">
+    <div class="wrap">
+      <div class="contact-box">
+        <h2>Let's make something</h2>
+        <p class="sub" style="margin-inline:auto">Write or call and the owner will answer.</p>
+        <div class="links">
+          <a class="btn" href="mailto:support@ai686.tech">support@ai686.tech</a>
+          <a class="btn ghost" href="tel:+18187470828">(818) 747-0828</a>
+        </div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="wrap">
+    <span>© 2026 ai686 · Los Angeles, CA</span>
+    <nav aria-label="Footer">
+      <a href="/privacy">Privacy</a>
+      <a href="/terms">Terms</a>
+      <a href="/sms">SMS Alerts</a>
+    </nav>
+  </div>
+</footer>
+
+</body>
+</html>
